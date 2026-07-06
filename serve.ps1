@@ -19,6 +19,15 @@ while ($listener.IsListening) {
   $ctx = $listener.GetContext()
   try {
     $path = $ctx.Request.Url.AbsolutePath
+    if ($ctx.Request.HttpMethod -eq "POST" -and $path -eq "/shot") {
+      # Testhulp: ontvang een screenshot (JPEG-bytes) en sla die op
+      $ms = New-Object System.IO.MemoryStream
+      $ctx.Request.InputStream.CopyTo($ms)
+      [System.IO.File]::WriteAllBytes((Join-Path $root "shot.jpg"), $ms.ToArray())
+      $ctx.Response.StatusCode = 200
+      $ctx.Response.OutputStream.Close()
+      continue
+    }
     if ($path -eq "/") { $path = "/index.html" }
     $file = Join-Path $root ($path.TrimStart("/") -replace "/", "\")
     if ((Test-Path $file -PathType Leaf) -and $file.StartsWith($root)) {

@@ -6,7 +6,7 @@ import { downloadFloorplan } from './floorplan.js';
 const EYE = 1.65;          // ooghoogte in meters
 const WALL_T = 0.2;        // muurdikte
 const OBJ_INSET = 0.12;    // marge tussen object en muur
-const STORAGE_KEY = 'gymPlannerLayoutV1';
+const STORAGE_KEY = 'gymPlannerLayoutV2';
 
 // ---------- Scene ----------
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -40,14 +40,30 @@ function buildGym(gym) {
   const g = new THREE.Group();
   const wallMat = new THREE.MeshStandardMaterial({ color: gym.wallColor, roughness: 0.95 });
   const floorMat = new THREE.MeshStandardMaterial({ color: gym.floorColor, roughness: 0.9 });
-  const ceilMat = new THREE.MeshStandardMaterial({ color: 0xf4f2ee, roughness: 1 });
+  // Basic-materiaal: plafond krijgt geen direct licht van bovenaf, dus
+  // standaard-materiaal zou onnatuurlijk donker ogen.
+  const ceilMat = new THREE.MeshBasicMaterial({ color: 0xdcdad5 });
 
   for (const r of gym.rects) {
     const w = r.maxX - r.minX, d = r.maxZ - r.minZ;
     const cx = (r.minX + r.maxX) / 2, cz = (r.minZ + r.maxZ) / 2;
-    const floor = new THREE.Mesh(new THREE.BoxGeometry(w, 0.1, d), floorMat);
-    floor.position.set(cx, -0.05, cz);
-    g.add(floor);
+    if (gym.floorBorder) {
+      // rand (bijv. witte klinkers) met daarbinnen de eigenlijke vloer
+      const b = gym.floorBorder.width;
+      const rand = new THREE.Mesh(
+        new THREE.BoxGeometry(w, 0.1, d),
+        new THREE.MeshStandardMaterial({ color: gym.floorBorder.color, roughness: 0.95 })
+      );
+      rand.position.set(cx, -0.05, cz);
+      g.add(rand);
+      const binnen = new THREE.Mesh(new THREE.BoxGeometry(w - 2 * b, 0.1, d - 2 * b), floorMat);
+      binnen.position.set(cx, -0.048, cz);
+      g.add(binnen);
+    } else {
+      const floor = new THREE.Mesh(new THREE.BoxGeometry(w, 0.1, d), floorMat);
+      floor.position.set(cx, -0.05, cz);
+      g.add(floor);
+    }
     const ceil = new THREE.Mesh(new THREE.BoxGeometry(w, 0.1, d), ceilMat);
     ceil.position.set(cx, gym.height + 0.05, cz);
     g.add(ceil);
@@ -59,32 +75,64 @@ function buildGym(gym) {
     const [x2, z2] = pts[(i + 1) % pts.length];
     const len = Math.hypot(x2 - x1, z2 - z1) + WALL_T;
     const alongX = Math.abs(x2 - x1) > Math.abs(z2 - z1);
-    const geo = alongX
-      ? new THREE.BoxGeometry(len, gym.height, WALL_T)
-      : new THREE.BoxGeometry(WALL_T, gym.height, len);
-    const wall = new THREE.Mesh(geo, wallMat);
-    wall.position.set((x1 + x2) / 2, gym.height / 2, (z1 + z2) / 2);
-    g.add(wall);
+    const cx = (x1 + x2) / 2, cz = (z1 + z2) / 2;
+    const lowH = gym.wallLower ? gym.wallLower.height : 0;
+    if (lowH > 0) {
+      // onderste deel (baksteen) + bovenste deel (tegels/panelen)
+      const lowGeo = alongX ? new THREE.BoxGeometry(len, lowH, WALL_T) : new THREE.BoxGeometry(WALL_T, lowH, len);
+      const low = new THREE.Mesh(lowGeo, new THREE.MeshStandardMaterial({ color: gym.wallLower.color, roughness: 0.95 }));
+      low.position.set(cx, lowH / 2, cz);
+      g.add(low);
+    }
+    const upH = gym.height - lowH;
+    const upGeo = alongX ? new THREE.BoxGeometry(len, upH, WALL_T) : new THREE.BoxGeometry(WALL_T, upH, len);
+    const up = new THREE.Mesh(upGeo, wallMat);
+    up.position.set(cx, lowH + upH / 2, cz);
+    g.add(up);
   }
 
-  if (gym.wallText) {
+  // hoge ramen (lichte vlakken op de muur)
+  for (const win of gym.windows || []) {
+    const raam = new THREE.Mesh(
+      new THREE.PlaneGeometry(win.w, win.h),
+      new THREE.MeshBasicMaterial({ color: 0xe4edf5 })
+    );
+    raam.position.set(win.x, win.y, win.z);
+    raam.rotation.y = win.ry || 0;
+    g.add(raam);
+  }
+
+  // muurteksten (canvas-textuur)
+  for (const decal of gym.decals || []) {
     const cv = document.createElement('canvas');
-    cv.width = 1024; cv.height = 160;
+    cv.width = 1024;
+    cv.height = Math.round(1024 * (decal.h / decal.w));
     const c = cv.getContext('2d');
-    c.fillStyle = '#c8c2b8';
-    c.fillRect(0, 0, 1024, 160);
-    c.fillStyle = '#30302c';
-    c.font = 'bold 96px Arial, sans-serif';
+    c.fillStyle = decal.bg;
+    c.fillRect(0, 0, cv.width, cv.height);
+    c.fillStyle = decal.color;
+    c.font = `bold ${Math.round(cv.height * 0.62)}px Georgia, serif`;
     c.textAlign = 'center';
     c.textBaseline = 'middle';
-    c.fillText(gym.wallText, 512, 86);
+    c.fillText(decal.text, cv.width / 2, cv.height * 0.54);
     const plane = new THREE.Mesh(
-      new THREE.PlaneGeometry(7, 1.1),
+      new THREE.PlaneGeometry(decal.w, decal.h),
       new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(cv) })
     );
-    const r = gym.rects[0];
-    plane.position.set((r.minX + r.maxX) / 2, gym.height - 1.0, r.minZ + WALL_T / 2 + 0.01);
+    plane.position.set(decal.x, decal.y, decal.z);
+    plane.rotation.y = decal.ry || 0;
     g.add(plane);
+  }
+
+  // vaste decoratie (deuren, radiator, vloerbelijning)
+  for (const d of gym.deco || []) {
+    const m = new THREE.Mesh(
+      new THREE.BoxGeometry(d.w, d.h, d.d),
+      new THREE.MeshStandardMaterial({ color: d.color, roughness: 0.9 })
+    );
+    m.position.set(d.x, d.y, d.z);
+    m.rotation.y = d.ry || 0;
+    g.add(m);
   }
   scene.add(g);
 }
@@ -104,29 +152,52 @@ let currentGymId = 'fitness';
 const player = { x: GYMS.fitness.spawn.x, z: GYMS.fitness.spawn.z, yaw: GYMS.fitness.spawn.yaw, pitch: 0 };
 const keys = {};
 
+// Beginopstelling: zo staat het er nu ongeveer bij, op basis van de foto's.
 const DEFAULT_LAYOUT = [
-  // Fitnessruimte
-  { type: 'loopband', x: -8.7, z: -2.2, rot: 0 },
-  { type: 'loopband', x: -7.5, z: -2.2, rot: 0 },
-  { type: 'hometrainer', x: -5.9, z: -2.4, rot: 0 },
-  { type: 'hometrainer', x: -5.0, z: -2.4, rot: 0 },
-  { type: 'roeitrainer', x: -8.3, z: 2.2, rot: Math.PI / 2 },
-  { type: 'mattenstapel', x: -1.6, z: 2.3, rot: 0 },
-  { type: 'dumbbellrek', x: 1.4, z: -2.6, rot: 0 },
-  { type: 'halterbank', x: 3.2, z: -1.7, rot: 0 },
-  { type: 'halterbank', x: 5.2, z: 0.6, rot: Math.PI / 2 },
-  { type: 'squatrack', x: 6.2, z: -2.1, rot: 0 },
-  { type: 'kabelstation', x: 9.3, z: 0, rot: -Math.PI / 2 },
-  // Blauwe zaal
-  { type: 'turnmat', x: 19.0, z: 2.8, rot: 0 },
-  { type: 'turnmat', x: 21.2, z: 2.8, rot: 0 },
-  { type: 'gymbank', x: 16.7, z: -2.0, rot: 0 },
-  { type: 'gymbank', x: 17.5, z: -2.0, rot: 0 },
-  { type: 'springkast', x: 24.6, z: -3.6, rot: 0 },
-  { type: 'minitrampoline', x: 24.5, z: 3.6, rot: 0 },
-  { type: 'ballenkar', x: 29.0, z: -4.2, rot: 0 },
-  { type: 'wandrek', x: 31.7, z: -2.5, rot: -Math.PI / 2 },
-  { type: 'pilonnenset', x: 30.5, z: -4.3, rot: 0 },
+  // Fitnessruimte — westkant (bij het "Fitnessruimte"-logo)
+  { type: 'valmatten', x: -8.8, z: -1.8, rot: 0 },
+  { type: 'minitrampoline', x: -8.9, z: 0.8, rot: Math.PI / 2 },
+  { type: 'hipthrust', x: -7.4, z: -1.9, rot: 0 },
+  { type: 'tvstandaard', x: -6.5, z: 2.55, rot: Math.PI },
+  { type: 'stellingkast', x: -4.5, z: 2.55, rot: Math.PI },
+  { type: 'trxframe', x: -4.5, z: -2.35, rot: 0 },
+  // midden
+  { type: 'kettlebellrek', x: -1.8, z: -2.6, rot: 0 },
+  { type: 'dumbbellrek_chroom', x: -0.4, z: -2.6, rot: 0 },
+  { type: 'plyobox60', x: 0.8, z: -2.5, rot: 0 },
+  { type: 'plyobox30_oranje', x: 2.0, z: -2.5, rot: 0 },
+  { type: 'medicijnballen', x: -1.0, z: 2.6, rot: Math.PI },
+  { type: 'sandbag', x: 0.2, z: 2.4, rot: 0 },
+  { type: 'buikspierbank', x: 1.8, z: 2.2, rot: Math.PI },
+  { type: 'verstelbank', x: 3.6, z: 1.2, rot: 0.4 },
+  // oostkant — racks en gewichten
+  { type: 'spiegel', x: 5.5, z: -2.83, rot: 0 },
+  { type: 'halfrack', x: 5.5, z: -1.9, rot: 0 },
+  { type: 'halterrek_schijven', x: 7.3, z: -2.6, rot: 0 },
+  { type: 'halfrack', x: 8.7, z: -1.9, rot: 0 },
+  { type: 'stangenrek', x: 9.5, z: 0.5, rot: -Math.PI / 2 },
+  { type: 'dumbbellrek_zwart', x: 6.5, z: 2.55, rot: Math.PI },
+  { type: 'legpress', x: 8.8, z: 1.8, rot: Math.PI },
+
+  // Blauwe zaal — cardiohoek (grote vierkant, westkant)
+  { type: 'loopband_matrix', x: 17.3, z: -3.3, rot: Math.PI / 2 },
+  { type: 'crosstrainer', x: 17.3, z: -1.4, rot: Math.PI / 2 },
+  { type: 'hometrainer', x: 17.3, z: 0.3, rot: Math.PI / 2 },
+  { type: 'spinningfiets', x: 19.8, z: -4.2, rot: 0 },
+  { type: 'spinningfiets', x: 21.0, z: -4.2, rot: 0 },
+  { type: 'spinningfiets', x: 22.2, z: -4.2, rot: 0 },
+  // zuidkant en midden
+  { type: 'flowin', x: 21.0, z: 1.6, rot: 0 },
+  { type: 'buikspierbank', x: 18.6, z: 3.9, rot: 0 },
+  { type: 'aerobicstep', x: 23.8, z: 4.4, rot: 0 },
+  { type: 'aerobicstep', x: 23.8, z: 3.8, rot: 0 },
+  { type: 'houten_plyobox', x: 24.9, z: 4.2, rot: 0 },
+  { type: 'plyobox60', x: 25.4, z: 3.1, rot: 0 },
+  // aanbouw (6 × 5)
+  { type: 'fietstrainer_zilver', x: 27.6, z: -3.9, rot: 0 },
+  { type: 'fietstrainer_zilver', x: 28.8, z: -3.9, rot: 0 },
+  { type: 'fietstrainer_zilver', x: 30.0, z: -3.9, rot: 0 },
+  { type: 'behandelbank', x: 31.4, z: -1.6, rot: 0 },
 ];
 
 function spawnObject(type, x, z, rot) {
@@ -450,6 +521,18 @@ window.addEventListener('resize', () => {
 });
 
 // Debug-hooks voor tests
+window.__shot = (w = 480) => {
+  camera.position.set(player.x, EYE, player.z);
+  camera.rotation.y = player.yaw;
+  camera.rotation.x = player.pitch;
+  renderer.render(scene, camera);
+  const src = renderer.domElement;
+  const cv = document.createElement('canvas');
+  cv.width = w;
+  cv.height = Math.round(w * src.height / src.width);
+  cv.getContext('2d').drawImage(src, 0, 0, cv.width, cv.height);
+  return cv.toDataURL('image/jpeg', 0.5);
+};
 window.__probe = (x, y) => {
   pointerNDC.set((x / window.innerWidth) * 2 - 1, -(y / window.innerHeight) * 2 + 1);
   raycaster.setFromCamera(pointerNDC, camera);
