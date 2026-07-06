@@ -1,0 +1,64 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body { height: 100%; overflow: hidden; font-family: "Segoe UI", system-ui, sans-serif; }
+
+canvas { display: block; }
+
+#hud {
+  position: fixed; top: 12px; left: 12px; z-index: 10;
+  background: rgba(20, 24, 32, 0.82); color: #eef2f7;
+  padding: 12px 14px; border-radius: 10px; max-width: 280px;
+  font-size: 13px; backdrop-filter: blur(4px);
+}
+#hud h1 { font-size: 17px; margin-bottom: 2px; }
+#gymLabel { color: #8fd0ff; font-weight: 600; margin-bottom: 8px; }
+#hud summary { cursor: pointer; color: #aab6c5; margin-bottom: 4px; }
+#hud ul { list-style: none; line-height: 1.55; }
+#hud b { color: #ffd479; font-weight: 600; }
+
+#panel {
+  position: fixed; top: 12px; right: 12px; z-index: 10; width: 250px;
+  background: rgba(20, 24, 32, 0.82); color: #eef2f7;
+  padding: 12px 14px; border-radius: 10px; font-size: 13px;
+  backdrop-filter: blur(4px); max-height: calc(100vh - 24px); overflow-y: auto;
+}
+#panel h2 { font-size: 14px; margin-bottom: 6px; color: #aab6c5; }
+.section { margin-bottom: 14px; }
+.section:last-child { margin-bottom: 0; }
+#inventory .empty { color: #78828f; font-size: 12px; }
+.inv-item {
+  display: flex; justify-content: space-between; align-items: center;
+  background: rgba(255,255,255,0.07); border-radius: 6px;
+  padding: 5px 8px; margin-bottom: 5px;
+}
+.inv-item button {
+  background: #2f7fd4; color: #fff; border: none; border-radius: 5px;
+  padding: 3px 10px; cursor: pointer; font-size: 12px;
+}
+.inv-item button:hover { background: #3f93ea; }
+.row { display: flex; gap: 6px; }
+#catalogSelect {
+  flex: 1; background: #2a3140; color: #eef2f7; border: 1px solid #3c4658;
+  border-radius: 6px; padding: 5px; font-size: 12px;
+}
+#addBtn {
+  background: #2f7fd4; color: #fff; border: none; border-radius: 6px;
+  width: 32px; cursor: pointer; font-size: 16px;
+}
+#addBtn:hover { background: #3f93ea; }
+.buttons button {
+  display: block; width: 100%; margin-bottom: 6px; padding: 8px;
+  background: #2a3140; color: #eef2f7; border: 1px solid #3c4658;
+  border-radius: 6px; cursor: pointer; font-size: 13px;
+}
+.buttons button:hover { background: #38425a; }
+.buttons button.danger { color: #ff9c9c; }
+
+#status {
+  position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+  z-index: 10; background: rgba(20, 24, 32, 0.85); color: #eef2f7;
+  padding: 8px 16px; border-radius: 20px; font-size: 13px;
+  display: none; white-space: nowrap;
+}
+#status.visible { display: block; }
+#status b { color: #8fd0ff; }

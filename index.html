@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gym Planner — indeling ontwerpen</title>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+  }
+}
+</script>
+</head>
+<body>
+  <div id="hud">
+    <h1>Gym Planner</h1>
+    <div id="gymLabel"></div>
+    <details open>
+      <summary>Besturing</summary>
+      <ul>
+        <li><b>Pijltjes / WASD</b> — lopen (Shift = sneller)</li>
+        <li><b>Twee vingers op touchpad</b> — rondkijken</li>
+        <li><b>Klik</b> op een object — selecteren</li>
+        <li><b>Slepen</b> — object verplaatsen</li>
+        <li><b>R</b> — geselecteerd object draaien</li>
+        <li><b>Delete</b> — object naar opslag</li>
+        <li><b>T</b> — wissel van zaal</li>
+        <li><b>Esc</b> — deselecteren / annuleren</li>
+      </ul>
+    </details>
+  </div>
+
+  <div id="panel">
+    <div class="section">
+      <h2>Opslag <span id="invCount"></span></h2>
+      <div id="inventory"><p class="empty">Leeg — druk op Delete bij een geselecteerd object.</p></div>
+    </div>
+    <div class="section">
+      <h2>Nieuw object</h2>
+      <div class="row">
+        <select id="catalogSelect"></select>
+        <button id="addBtn" title="Plaats een nieuw object in de zaal waar je nu staat">+</button>
+      </div>
+    </div>
+    <div class="section buttons">
+      <button id="switchBtn">⇄ Wissel van zaal (T)</button>
+      <button id="planBtn">⬇ Download plattegrond</button>
+      <button id="resetBtn" class="danger">Reset indeling</button>
+    </div>
+  </div>
+
+  <div id="status"></div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
