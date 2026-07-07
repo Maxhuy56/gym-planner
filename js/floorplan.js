@@ -86,9 +86,11 @@ export function downloadFloorplan(gyms, objects, inventory, catalog) {
       for (let z = r.minZ + 1; z < r.maxZ; z++) {
         ctx.beginPath(); ctx.moveTo(px(r.minX), py(z)); ctx.lineTo(px(r.maxX), py(z)); ctx.stroke();
       }
-      ctx.fillStyle = '#8a8a8a';
-      ctx.font = '11px Segoe UI, sans-serif';
-      ctx.fillText(`${r.maxX - r.minX} × ${r.maxZ - r.minZ} m`, px(r.minX) + 5, py(r.minZ) + 14);
+      if (!r.noLabel) {
+        ctx.fillStyle = '#8a8a8a';
+        ctx.font = '11px Segoe UI, sans-serif';
+        ctx.fillText(r.label || `${r.maxX - r.minX} × ${r.maxZ - r.minZ} m`, px(r.minX) + 5, py(r.minZ) + 14);
+      }
     }
 
     // buitenmuur

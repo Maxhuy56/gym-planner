@@ -14,10 +14,9 @@ export const GYMS = {
     rects: [{ minX: -10, maxX: 10, minZ: -3, maxZ: 3 }],
     outline: [[-10, -3], [10, -3], [10, 3], [-10, 3]],
     spawn: { x: -6.0, z: 0.6, yaw: -Math.PI / 2 },
-    // hoge ramen met lamellen aan de zuidkant (lange muur)
-    windows: [-7, -3.5, 0, 3.5, 7].map(x => ({ x, z: 2.88, y: 2.85, w: 2.6, h: 1.1, ry: Math.PI })),
     decals: [
-      { text: 'Fitnessruimte', color: '#a8863c', x: -9.88, y: 2.9, z: 0, ry: Math.PI / 2, w: 5, h: 0.9 },
+      // gouden tekst op de zuidmuur, helemaal in de (oost)hoek
+      { text: 'Fitnessruimte', color: '#a8863c', x: 7.3, y: 2.9, z: 2.86, ry: Math.PI, w: 5, h: 0.9 },
       { type: 'clock', x: 9.87, y: 3.1, z: 0, ry: -Math.PI / 2, w: 0.55, h: 0.55 },
     ],
     // tl-armaturen in twee rijen
@@ -30,44 +29,68 @@ export const GYMS = {
       { w: 0.05, h: 0.012, d: 5.0, color: 0xdddddd, x: 0, y: 0.006, z: 0 },
       { w: 0.05, h: 0.012, d: 2.6, color: 0xdddddd, x: -0.9, y: 0.006, z: -1.4, ry: 0.6 },
       { w: 0.05, h: 0.012, d: 2.6, color: 0xdddddd, x: 0.9, y: 0.006, z: -1.4, ry: -0.6 },
-      // witte stalen kolommen tussen de ramen + draagbalk over het plafond
+      // witte stalen kolommen + draagbalk over het plafond
       { w: 0.28, h: 4.0, d: 0.3, color: 0xf3f2ee, x: -5.25, y: 2.0, z: 2.78 },
       { w: 0.28, h: 4.0, d: 0.3, color: 0xf3f2ee, x: -1.75, y: 2.0, z: 2.78 },
       { w: 0.28, h: 4.0, d: 0.3, color: 0xf3f2ee, x: 1.75, y: 2.0, z: 2.78 },
       { w: 0.28, h: 4.0, d: 0.3, color: 0xf3f2ee, x: 5.25, y: 2.0, z: 2.78 },
       { w: 0.45, h: 0.5, d: 6.0, color: 0xf0efeb, x: -1.3, y: 3.72, z: 0 },
+      // deur op de noordmuur, tegenover de tekst
+      { w: 1.0, h: 2.1, d: 0.06, color: 0xf7f6f2, x: 7.3, y: 1.05, z: -2.86 },
     ],
   },
   blauw: {
     id: 'blauw',
-    name: 'Blauwe zaal (10 × 10 m + 7 × 4 m)',
+    name: 'Blauwe zaal (10 × 10 m + 4 × 7 m)',
     floorColor: 0x8fa9b6,        // lichtblauw linoleum
     wallColor: 0xf0ede5,         // crèmewitte wanden
     height: 3.1,
+    // Het grote vierkant is gesplitst in drie rechthoeken zodat de
+    // inbouw (1 m diep x 1,5 m breed, rechts van de middenlijn aan de
+    // westmuur) écht ruimte inneemt: je kunt er niet doorheen lopen en
+    // er geen objecten plaatsen.
     rects: [
-      { minX: 16, maxX: 26, minZ: -5, maxZ: 5 },   // 10 x 10
-      { minX: 26, maxX: 33, minZ: -5, maxZ: -1 },  // aanbouw: 7 breed x 4 diep
+      { minX: 17, maxX: 26, minZ: -5, maxZ: 5, label: '10 × 10 m' },
+      { minX: 16, maxX: 17, minZ: -5, maxZ: -1.7, noLabel: true },
+      { minX: 16, maxX: 17, minZ: -0.2, maxZ: 5, noLabel: true },
+      { minX: 26, maxX: 30, minZ: -5, maxZ: 2, label: '4 × 7 m' },   // aanbouw: 4 breed x 7 diep
     ],
-    outline: [[16, -5], [33, -5], [33, -1], [26, -1], [26, 5], [16, 5]],
+    outline: [
+      [16, -5], [30, -5], [30, 2], [26, 2], [26, 5], [16, 5],
+      [16, -0.2], [17, -0.2], [17, -1.7], [16, -1.7],
+    ],
+    // plafond doorlopend over de hele zaal, ook boven de inbouw
+    ceilRects: [
+      { minX: 16, maxX: 26, minZ: -5, maxZ: 5 },
+      { minX: 26, maxX: 30, minZ: -5, maxZ: 2 },
+    ],
     spawn: { x: 21.5, z: 3.2, yaw: Math.PI / 4 },
     decals: [
       { text: '“One day or day one. You decide.”', color: '#2c2c2c', x: 21, y: 2.45, z: -4.88, ry: 0, w: 6, h: 0.55 },
-      { type: 'clock', x: 16.13, y: 2.4, z: 0, ry: Math.PI / 2, w: 0.5, h: 0.5 },
+      // klok in de aanbouw, oostmuur, rechts van het midden
+      { type: 'clock', x: 29.87, y: 2.35, z: 0.3, ry: -Math.PI / 2, w: 0.5, h: 0.5 },
     ],
     // vierkante plafondpanelen (verlichting)
     lights: [
       { x: 18.5, z: -2.5, w: 0.95, d: 0.95 }, { x: 18.5, z: 2.5, w: 0.95, d: 0.95 },
       { x: 21.5, z: -2.5, w: 0.95, d: 0.95 }, { x: 21.5, z: 2.5, w: 0.95, d: 0.95 },
       { x: 24.5, z: -2.5, w: 0.95, d: 0.95 }, { x: 24.5, z: 2.5, w: 0.95, d: 0.95 },
-      { x: 28, z: -2.5, w: 0.95, d: 0.95 }, { x: 31, z: -2.5, w: 0.95, d: 0.95 },
+      { x: 28, z: -3, w: 0.95, d: 0.95 }, { x: 28, z: 0, w: 0.95, d: 0.95 },
     ],
-    // witte deuren met matglas (Willem II-logo) + radiator + nooduitgang-bordje
     deco: [
-      { w: 0.06, h: 2.1, d: 1.0, color: 0xf7f6f2, x: 16.04, y: 1.05, z: 3.2 },   // deur west
-      { w: 0.06, h: 2.1, d: 1.0, color: 0xf7f6f2, x: 16.04, y: 1.05, z: -3.4 },  // deur west 2
-      { w: 1.0, h: 2.1, d: 0.06, color: 0xf7f6f2, x: 30.8, y: 1.05, z: -4.94 },  // deur zuid (nooduitgang)
-      { w: 2.6, h: 0.55, d: 0.12, color: 0xf3f2ee, x: 21, y: 0.35, z: -4.9 },    // radiator
-      { w: 0.38, h: 0.16, d: 0.06, color: 0x2e9e4f, x: 30.8, y: 2.32, z: -4.9, basic: true }, // exit-bordje
+      // westmuur (binnenvlak x=16,10): witte deur, glazen deur in het midden, raam links daarvan
+      { w: 0.06, h: 2.1, d: 1.0, color: 0xf7f6f2, x: 16.12, y: 1.05, z: -3.4 },            // witte deur
+      { w: 0.05, h: 2.1, d: 1.0, color: 0xf7f6f2, x: 16.12, y: 1.05, z: 0.4 },             // kozijn glazen deur
+      { w: 0.06, h: 1.95, d: 0.85, color: 0xc9dfec, x: 16.13, y: 1.02, z: 0.4, basic: true }, // glas
+      { w: 0.05, h: 1.5, d: 1.4, color: 0xf7f6f2, x: 16.12, y: 1.55, z: 2.2 },             // kozijn raam
+      { w: 0.06, h: 1.36, d: 1.26, color: 0xd6e6f0, x: 16.13, y: 1.55, z: 2.2, basic: true }, // ruit
+      // aanbouw: deur in het midden van de oostmuur (naast de klok)
+      { w: 0.06, h: 2.1, d: 1.0, color: 0xf7f6f2, x: 29.88, y: 1.05, z: -1.5 },
+      // nooduitgang op de zuidmuur van de aanbouw + bordje
+      { w: 1.0, h: 2.1, d: 0.06, color: 0xf7f6f2, x: 28, y: 1.05, z: -4.86 },
+      { w: 0.38, h: 0.16, d: 0.06, color: 0x2e9e4f, x: 28, y: 2.32, z: -4.85, basic: true },
+      // radiator
+      { w: 2.6, h: 0.55, d: 0.12, color: 0xf3f2ee, x: 21, y: 0.35, z: -4.82 },
     ],
   },
 };

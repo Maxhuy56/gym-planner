@@ -3,7 +3,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { GYMS, pointInGym, gymAt, clampToGym, rotatedHalfExtents } from './rooms.js';
 import { CATALOG, createObject } from './catalog.js';
 import { downloadFloorplan } from './floorplan.js';
-import { brickTex, tileTex, rubberTex, klinkerTex, linoTex, ceilTex, blindsTex, clockTex } from './textures.js';
+import { brickTex, tileTex, rubberTex, klinkerTex, linoTex, ceilTex, blindsTex, clockTex, glowTex } from './textures.js';
 
 const EYE = 1.65;          // ooghoogte in meters
 const WALL_T = 0.2;        // muurdikte
@@ -89,11 +89,15 @@ function buildGym(gym) {
       floor.receiveShadow = true;
       g.add(floor);
     }
+  }
+
+  for (const r of gym.ceilRects || gym.rects) {
+    const w = r.maxX - r.minX, d = r.maxZ - r.minZ;
     const ceil = new THREE.Mesh(
       new THREE.BoxGeometry(w, 0.1, d),
       new THREE.MeshBasicMaterial({ map: ceilTex(w / 1.2, d / 1.2) })
     );
-    ceil.position.set(cx, gym.height + 0.05, cz);
+    ceil.position.set((r.minX + r.maxX) / 2, gym.height + 0.05, (r.minZ + r.maxZ) / 2);
     g.add(ceil);
   }
 
@@ -146,7 +150,8 @@ function buildGym(gym) {
     g.add(kozijn);
   }
 
-  // plafondarmaturen (zelfverlichtend)
+  // plafondarmaturen (zelfverlichtend) met warme gloed alsof ze aan staan
+  const gloedTex = glowTex();
   for (const li of gym.lights || []) {
     const paneel = new THREE.Mesh(
       new THREE.BoxGeometry(li.w, 0.06, li.d),
@@ -154,6 +159,16 @@ function buildGym(gym) {
     );
     paneel.position.set(li.x, gym.height - 0.04, li.z);
     g.add(paneel);
+    const gloed = new THREE.Mesh(
+      new THREE.PlaneGeometry(Math.max(li.w, li.d) * 2.6, Math.max(li.w, li.d) * 2.6),
+      new THREE.MeshBasicMaterial({
+        map: gloedTex, transparent: true, depthWrite: false,
+        blending: THREE.AdditiveBlending, opacity: 0.75,
+      })
+    );
+    gloed.rotation.x = Math.PI / 2;
+    gloed.position.set(li.x, gym.height - 0.12, li.z);
+    g.add(gloed);
   }
 
   // muurdecoraties: teksten en klokken (transparante canvas-textuur)
@@ -262,13 +277,13 @@ const DEFAULT_LAYOUT = [
   { type: 'houten_plyobox', x: 24.9, z: 4.2, rot: 0 },
   { type: 'plyobox60', x: 25.4, z: 3.1, rot: 0 },
   // aanbouw (6 × 5)
-  { type: 'fietstrainer_zilver', x: 27.6, z: -3.9, rot: 0 },
-  { type: 'fietstrainer_zilver', x: 28.8, z: -3.9, rot: 0 },
-  { type: 'fietstrainer_zilver', x: 30.0, z: -3.9, rot: 0 },
-  { type: 'behandelbank', x: 31.6, z: -2.3, rot: Math.PI / 2 },
+  { type: 'fietstrainer_zilver', x: 27.0, z: -3.9, rot: 0 },
+  { type: 'fietstrainer_zilver', x: 28.2, z: -3.9, rot: 0 },
+  { type: 'fietstrainer_zilver', x: 29.4, z: -3.9, rot: 0 },
+  { type: 'behandelbank', x: 29.3, z: -0.6, rot: 0 },
   { type: 'roeimachine', x: 22.8, z: 0.4, rot: Math.PI / 2 },
   { type: 'romanchair', x: 20.4, z: 4.1, rot: 0 },
-  { type: 'mattenrek', x: 27.3, z: -1.7, rot: Math.PI },
+  { type: 'mattenrek', x: 27.0, z: 1.5, rot: 0 },
   { type: 'plyobox45_grijs', x: 24.6, z: 2.6, rot: 0 },
   { type: 'keiser', x: 25.3, z: -4.45, rot: 0 },
 ];
@@ -594,6 +609,10 @@ window.addEventListener('resize', () => {
 });
 
 // Debug-hooks voor tests
+window.__goto = (x, z, yaw, gymId) => {
+  if (gymId) { currentGymId = gymId; updateGymLabel(); }
+  player.x = x; player.z = z; player.yaw = yaw; player.pitch = 0;
+};
 window.__shot = (w = 480) => {
   camera.position.set(player.x, EYE, player.z);
   camera.rotation.y = player.yaw;

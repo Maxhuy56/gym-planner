@@ -760,15 +760,15 @@ export const CATALOG = {
     },
   },
   flowin: {
-    name: 'FLOWIN-mat', w: 0.75, d: 1.7,
+    name: 'FLOWIN-mat', w: 1.0, d: 1.4,
     build() {
       const g = new THREE.Group();
-      g.add(box(0.75, 0.018, 1.7, [0x141414, 0.4, 0], 0, 0.009, 0));
-      const voet = label('FOOT', 0.14, 0.05, -0.15, 0.02, -0.45, 0);
+      g.add(box(1.0, 0.018, 1.4, [0x141414, 0.4, 0], 0, 0.009, 0));
+      const voet = label('FOOT', 0.14, 0.05, -0.2, 0.02, -0.35, 0);
       voet.rotation.x = -Math.PI / 2;
-      const hand = label('HAND', 0.14, 0.05, 0.18, 0.02, -0.3, 0);
+      const hand = label('HAND', 0.14, 0.05, 0.22, 0.02, -0.22, 0);
       hand.rotation.x = -Math.PI / 2;
-      const logo = label('FLOWIN', 0.5, 0.12, 0, 0.02, 0.55, 0);
+      const logo = label('FLOWIN', 0.5, 0.12, 0, 0.02, 0.45, 0);
       logo.rotation.x = -Math.PI / 2;
       g.add(voet, hand, logo);
       return g;

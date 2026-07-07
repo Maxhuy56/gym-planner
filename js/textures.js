@@ -145,6 +145,22 @@ export function blindsTex() {
   });
 }
 
+// Warme lichtgloed (voor onder de plafondarmaturen)
+export function glowTex() {
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = 128;
+  const c = cv.getContext('2d');
+  const grad = c.createRadialGradient(64, 64, 6, 64, 64, 62);
+  grad.addColorStop(0, 'rgba(255,244,214,0.85)');
+  grad.addColorStop(0.5, 'rgba(255,240,200,0.28)');
+  grad.addColorStop(1, 'rgba(255,240,200,0)');
+  c.fillStyle = grad;
+  c.fillRect(0, 0, 128, 128);
+  const t = new THREE.CanvasTexture(cv);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
 // Klokgezicht (voor aan de muur)
 export function clockTex() {
   const cv = document.createElement('canvas');
