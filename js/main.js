@@ -1,7 +1,9 @@
 import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { GYMS, pointInGym, gymAt, clampToGym, rotatedHalfExtents } from './rooms.js';
 import { CATALOG, createObject } from './catalog.js';
 import { downloadFloorplan } from './floorplan.js';
+import { brickTex, tileTex, rubberTex, klinkerTex, linoTex, ceilTex, blindsTex, clockTex } from './textures.js';
 
 const EYE = 1.65;          // ooghoogte in meters
 const WALL_T = 0.2;        // muurdikte
@@ -12,18 +14,36 @@ const STORAGE_KEY = 'gymPlannerLayoutV2';
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
 document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xb9cfe4);
 
+// Omgevingsreflecties zodat chroom/staal er metaalachtig uitziet
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.05, 200);
 camera.rotation.order = 'YXZ';
 
-scene.add(new THREE.HemisphereLight(0xffffff, 0x51606e, 1.1));
-const sun = new THREE.DirectionalLight(0xffffff, 1.4);
-sun.position.set(30, 50, 20);
-scene.add(sun);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x51606e, 0.85));
+const sun = new THREE.DirectionalLight(0xfff4e0, 1.5);
+sun.position.set(11, 20, 8);
+sun.target.position.set(11, 0, 0);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.left = -24;
+sun.shadow.camera.right = 24;
+sun.shadow.camera.top = 12;
+sun.shadow.camera.bottom = -12;
+sun.shadow.camera.near = 1;
+sun.shadow.camera.far = 45;
+sun.shadow.bias = -0.0004;
+scene.add(sun, sun.target);
 scene.add(new THREE.AmbientLight(0xffffff, 0.35));
 
 // terrein buiten de zalen
@@ -33,38 +53,46 @@ const ground = new THREE.Mesh(
 );
 ground.rotation.x = -Math.PI / 2;
 ground.position.y = -0.03;
+ground.receiveShadow = true;
 scene.add(ground);
 
 // ---------- Zalen bouwen ----------
 function buildGym(gym) {
   const g = new THREE.Group();
-  const wallMat = new THREE.MeshStandardMaterial({ color: gym.wallColor, roughness: 0.95 });
-  const floorMat = new THREE.MeshStandardMaterial({ color: gym.floorColor, roughness: 0.9 });
   // Basic-materiaal: plafond krijgt geen direct licht van bovenaf, dus
   // standaard-materiaal zou onnatuurlijk donker ogen.
-  const ceilMat = new THREE.MeshBasicMaterial({ color: 0xdcdad5 });
+  const ceilMat = new THREE.MeshBasicMaterial({ color: 0xcfcdc8 });
 
   for (const r of gym.rects) {
     const w = r.maxX - r.minX, d = r.maxZ - r.minZ;
     const cx = (r.minX + r.maxX) / 2, cz = (r.minZ + r.maxZ) / 2;
+    const floorMat = gym.id === 'fitness'
+      ? new THREE.MeshStandardMaterial({ map: rubberTex(w / 2, d / 2), roughness: 0.92 })
+      : new THREE.MeshStandardMaterial({ map: linoTex(w / 2.5, d / 2.5), roughness: 0.5, envMapIntensity: 0.35 });
     if (gym.floorBorder) {
-      // rand (bijv. witte klinkers) met daarbinnen de eigenlijke vloer
+      // rand van witte klinkers met daarbinnen de rubbervloer
       const b = gym.floorBorder.width;
       const rand = new THREE.Mesh(
         new THREE.BoxGeometry(w, 0.1, d),
-        new THREE.MeshStandardMaterial({ color: gym.floorBorder.color, roughness: 0.95 })
+        new THREE.MeshStandardMaterial({ map: klinkerTex(w / 1.4, d / 1.4), roughness: 0.95 })
       );
       rand.position.set(cx, -0.05, cz);
+      rand.receiveShadow = true;
       g.add(rand);
       const binnen = new THREE.Mesh(new THREE.BoxGeometry(w - 2 * b, 0.1, d - 2 * b), floorMat);
       binnen.position.set(cx, -0.048, cz);
+      binnen.receiveShadow = true;
       g.add(binnen);
     } else {
       const floor = new THREE.Mesh(new THREE.BoxGeometry(w, 0.1, d), floorMat);
       floor.position.set(cx, -0.05, cz);
+      floor.receiveShadow = true;
       g.add(floor);
     }
-    const ceil = new THREE.Mesh(new THREE.BoxGeometry(w, 0.1, d), ceilMat);
+    const ceil = new THREE.Mesh(
+      new THREE.BoxGeometry(w, 0.1, d),
+      new THREE.MeshBasicMaterial({ map: ceilTex(w / 1.2, d / 1.2) })
+    );
     ceil.position.set(cx, gym.height + 0.05, cz);
     g.add(ceil);
   }
@@ -78,60 +106,95 @@ function buildGym(gym) {
     const cx = (x1 + x2) / 2, cz = (z1 + z2) / 2;
     const lowH = gym.wallLower ? gym.wallLower.height : 0;
     if (lowH > 0) {
-      // onderste deel (baksteen) + bovenste deel (tegels/panelen)
+      // onderste deel: witte baksteen
       const lowGeo = alongX ? new THREE.BoxGeometry(len, lowH, WALL_T) : new THREE.BoxGeometry(WALL_T, lowH, len);
-      const low = new THREE.Mesh(lowGeo, new THREE.MeshStandardMaterial({ color: gym.wallLower.color, roughness: 0.95 }));
+      const low = new THREE.Mesh(lowGeo, new THREE.MeshStandardMaterial({
+        map: brickTex(len / 1.8, lowH / 0.55), roughness: 0.95,
+      }));
       low.position.set(cx, lowH / 2, cz);
+      low.receiveShadow = true;
       g.add(low);
     }
+    // bovenste deel: tegelpanelen (fitness) of glad stucwerk (blauw)
     const upH = gym.height - lowH;
     const upGeo = alongX ? new THREE.BoxGeometry(len, upH, WALL_T) : new THREE.BoxGeometry(WALL_T, upH, len);
-    const up = new THREE.Mesh(upGeo, wallMat);
+    const upMat = gym.id === 'fitness'
+      ? new THREE.MeshStandardMaterial({ map: tileTex(len / 1.2, upH / 1.2), roughness: 0.9 })
+      : new THREE.MeshStandardMaterial({ color: gym.wallColor, roughness: 0.95 });
+    const up = new THREE.Mesh(upGeo, upMat);
     up.position.set(cx, lowH + upH / 2, cz);
+    up.receiveShadow = true;
     g.add(up);
   }
 
-  // hoge ramen (lichte vlakken op de muur)
+  // hoge ramen met lamellen + donker kozijn
   for (const win of gym.windows || []) {
     const raam = new THREE.Mesh(
       new THREE.PlaneGeometry(win.w, win.h),
-      new THREE.MeshBasicMaterial({ color: 0xe4edf5 })
+      new THREE.MeshBasicMaterial({ map: blindsTex() })
     );
     raam.position.set(win.x, win.y, win.z);
     raam.rotation.y = win.ry || 0;
     g.add(raam);
+    const kozijn = new THREE.Mesh(
+      new THREE.BoxGeometry(win.w + 0.12, win.h + 0.12, 0.04),
+      new THREE.MeshStandardMaterial({ color: 0x70747a, roughness: 0.6, metalness: 0.4 })
+    );
+    kozijn.position.set(win.x, win.y, win.z);
+    kozijn.rotation.y = win.ry || 0;
+    kozijn.translateZ(-0.025);
+    g.add(kozijn);
   }
 
-  // muurteksten (canvas-textuur)
+  // plafondarmaturen (zelfverlichtend)
+  for (const li of gym.lights || []) {
+    const paneel = new THREE.Mesh(
+      new THREE.BoxGeometry(li.w, 0.06, li.d),
+      new THREE.MeshBasicMaterial({ color: 0xfff8ea })
+    );
+    paneel.position.set(li.x, gym.height - 0.04, li.z);
+    g.add(paneel);
+  }
+
+  // muurdecoraties: teksten en klokken (transparante canvas-textuur)
   for (const decal of gym.decals || []) {
-    const cv = document.createElement('canvas');
-    cv.width = 1024;
-    cv.height = Math.round(1024 * (decal.h / decal.w));
-    const c = cv.getContext('2d');
-    c.fillStyle = decal.bg;
-    c.fillRect(0, 0, cv.width, cv.height);
-    c.fillStyle = decal.color;
-    c.font = `bold ${Math.round(cv.height * 0.62)}px Georgia, serif`;
-    c.textAlign = 'center';
-    c.textBaseline = 'middle';
-    c.fillText(decal.text, cv.width / 2, cv.height * 0.54);
+    let tex;
+    if (decal.type === 'clock') {
+      tex = clockTex();
+    } else {
+      const cv = document.createElement('canvas');
+      cv.width = 1024;
+      cv.height = Math.max(64, Math.round(1024 * (decal.h / decal.w)));
+      const c = cv.getContext('2d');
+      c.clearRect(0, 0, cv.width, cv.height);
+      c.fillStyle = decal.color;
+      c.font = `bold ${Math.round(cv.height * 0.6)}px Georgia, serif`;
+      c.textAlign = 'center';
+      c.textBaseline = 'middle';
+      c.fillText(decal.text, cv.width / 2, cv.height * 0.54);
+      tex = new THREE.CanvasTexture(cv);
+      tex.colorSpace = THREE.SRGBColorSpace;
+    }
     const plane = new THREE.Mesh(
       new THREE.PlaneGeometry(decal.w, decal.h),
-      new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(cv) })
+      new THREE.MeshBasicMaterial({ map: tex, transparent: true })
     );
     plane.position.set(decal.x, decal.y, decal.z);
     plane.rotation.y = decal.ry || 0;
     g.add(plane);
   }
 
-  // vaste decoratie (deuren, radiator, vloerbelijning)
+  // vaste decoratie (deuren, radiator, vloerbelijning, kolommen)
   for (const d of gym.deco || []) {
     const m = new THREE.Mesh(
       new THREE.BoxGeometry(d.w, d.h, d.d),
-      new THREE.MeshStandardMaterial({ color: d.color, roughness: 0.9 })
+      d.basic
+        ? new THREE.MeshBasicMaterial({ color: d.color })
+        : new THREE.MeshStandardMaterial({ color: d.color, roughness: 0.9 })
     );
     m.position.set(d.x, d.y, d.z);
     m.rotation.y = d.ry || 0;
+    m.receiveShadow = true;
     g.add(m);
   }
   scene.add(g);

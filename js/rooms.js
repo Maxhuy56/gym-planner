@@ -17,13 +17,25 @@ export const GYMS = {
     // hoge ramen met lamellen aan de zuidkant (lange muur)
     windows: [-7, -3.5, 0, 3.5, 7].map(x => ({ x, z: 2.88, y: 2.85, w: 2.6, h: 1.1, ry: Math.PI })),
     decals: [
-      { text: 'Fitnessruimte', color: '#a8863c', bg: '#e7e3da', x: -9.88, y: 2.9, z: 0, ry: Math.PI / 2, w: 5, h: 0.9 },
+      { text: 'Fitnessruimte', color: '#a8863c', x: -9.88, y: 2.9, z: 0, ry: Math.PI / 2, w: 5, h: 0.9 },
+      { type: 'clock', x: 9.87, y: 3.1, z: 0, ry: -Math.PI / 2, w: 0.55, h: 0.55 },
     ],
-    // witte belijning op de rubbervloer (decoratief)
+    // tl-armaturen in twee rijen
+    lights: [-8, -4.8, -1.6, 1.6, 4.8, 8].flatMap(x => [
+      { x, z: -1.5, w: 1.8, d: 0.3 },
+      { x, z: 1.5, w: 1.8, d: 0.3 },
+    ]),
     deco: [
+      // witte belijning op de rubbervloer
       { w: 0.05, h: 0.012, d: 5.0, color: 0xdddddd, x: 0, y: 0.006, z: 0 },
       { w: 0.05, h: 0.012, d: 2.6, color: 0xdddddd, x: -0.9, y: 0.006, z: -1.4, ry: 0.6 },
       { w: 0.05, h: 0.012, d: 2.6, color: 0xdddddd, x: 0.9, y: 0.006, z: -1.4, ry: -0.6 },
+      // witte stalen kolommen tussen de ramen + draagbalk over het plafond
+      { w: 0.28, h: 4.0, d: 0.3, color: 0xf3f2ee, x: -5.25, y: 2.0, z: 2.78 },
+      { w: 0.28, h: 4.0, d: 0.3, color: 0xf3f2ee, x: -1.75, y: 2.0, z: 2.78 },
+      { w: 0.28, h: 4.0, d: 0.3, color: 0xf3f2ee, x: 1.75, y: 2.0, z: 2.78 },
+      { w: 0.28, h: 4.0, d: 0.3, color: 0xf3f2ee, x: 5.25, y: 2.0, z: 2.78 },
+      { w: 0.45, h: 0.5, d: 6.0, color: 0xf0efeb, x: -1.3, y: 3.72, z: 0 },
     ],
   },
   blauw: {
@@ -39,14 +51,23 @@ export const GYMS = {
     outline: [[16, -5], [32, -5], [32, 0], [26, 0], [26, 5], [16, 5]],
     spawn: { x: 21.5, z: 3.2, yaw: Math.PI / 4 },
     decals: [
-      { text: '“One day or day one. You decide.”', color: '#2c2c2c', bg: '#f0ede5', x: 21, y: 2.45, z: -4.88, ry: 0, w: 6, h: 0.55 },
+      { text: '“One day or day one. You decide.”', color: '#2c2c2c', x: 21, y: 2.45, z: -4.88, ry: 0, w: 6, h: 0.55 },
+      { type: 'clock', x: 16.13, y: 2.4, z: 0, ry: Math.PI / 2, w: 0.5, h: 0.5 },
     ],
-    // witte deuren met matglas (Willem II-logo) + radiator langs de muur
+    // vierkante plafondpanelen (verlichting)
+    lights: [
+      { x: 18.5, z: -2.5, w: 0.95, d: 0.95 }, { x: 18.5, z: 2.5, w: 0.95, d: 0.95 },
+      { x: 21.5, z: -2.5, w: 0.95, d: 0.95 }, { x: 21.5, z: 2.5, w: 0.95, d: 0.95 },
+      { x: 24.5, z: -2.5, w: 0.95, d: 0.95 }, { x: 24.5, z: 2.5, w: 0.95, d: 0.95 },
+      { x: 28, z: -2.5, w: 0.95, d: 0.95 }, { x: 31, z: -2.5, w: 0.95, d: 0.95 },
+    ],
+    // witte deuren met matglas (Willem II-logo) + radiator + nooduitgang-bordje
     deco: [
       { w: 0.06, h: 2.1, d: 1.0, color: 0xf7f6f2, x: 16.04, y: 1.05, z: 3.2 },   // deur west
       { w: 0.06, h: 2.1, d: 1.0, color: 0xf7f6f2, x: 16.04, y: 1.05, z: -3.4 },  // deur west 2
       { w: 1.0, h: 2.1, d: 0.06, color: 0xf7f6f2, x: 30.8, y: 1.05, z: -4.94 },  // deur zuid (nooduitgang)
       { w: 2.6, h: 0.55, d: 0.12, color: 0xf3f2ee, x: 21, y: 0.35, z: -4.9 },    // radiator
+      { w: 0.38, h: 0.16, d: 0.06, color: 0x2e9e4f, x: 30.8, y: 2.32, z: -4.9, basic: true }, // exit-bordje
     ],
   },
 };
