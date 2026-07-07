@@ -289,6 +289,35 @@ export const CATALOG = {
       return g;
     },
   },
+  plyobox45_grijs: {
+    name: 'Plyobox 45 cm grijs (soft)', w: 0.9, d: 0.7,
+    build() {
+      const g = new THREE.Group();
+      g.add(box(0.9, 0.41, 0.7, [0x71757b, 0.85, 0], 0, 0.21, 0));
+      g.add(box(0.91, 0.05, 0.71, [0x3a3a3a, 0.85, 0], 0, 0.44, 0));
+      g.add(label('45 CM', 0.3, 0.1, 0, 0.2, 0.352, 0, '#2e2e2e'));
+      return g;
+    },
+  },
+  keiser: {
+    name: 'Keiser cable station', w: 0.8, d: 0.85,
+    build() {
+      const g = new THREE.Group();
+      // toren met voetplaat
+      g.add(box(0.7, 0.06, 0.8, C.frame, 0, 0.04, 0));
+      g.add(box(0.35, 2.2, 0.3, [0x2a2c30, 0.5, 0.35], 0, 1.13, -0.2));
+      g.add(box(0.37, 0.55, 0.32, C.rood, 0, 1.15, -0.2));           // Keiser-rood middenstuk
+      g.add(label('KEISER', 0.3, 0.08, 0, 1.5, -0.03, 0));
+      // verstelbare katrol-arm met kabel en handvat
+      g.add(tube(0, 0.9, -0.08, 0, 0.9, 0.32, 0.035, C.staal));
+      g.add(cyl(0.06, 0.05, C.kunststof, 0, 0.9, 0.36, 'x', 14));    // katrol
+      g.add(tube(0, 0.9, 0.38, 0, 0.55, 0.38, 0.012, [0x14151a, 0.6, 0.2])); // kabel
+      g.add(cyl(0.018, 0.16, C.kunststof, 0, 0.53, 0.38, 'x'));      // handvat
+      // luchtdruk-cilinder (kenmerkend voor Keiser)
+      g.add(cyl(0.05, 0.8, C.rvs, -0.22, 1.0, -0.2));
+      return g;
+    },
+  },
   houten_plyobox: {
     name: 'Houten plyobox', w: 0.7, d: 0.6,
     build() {

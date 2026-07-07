@@ -265,10 +265,12 @@ const DEFAULT_LAYOUT = [
   { type: 'fietstrainer_zilver', x: 27.6, z: -3.9, rot: 0 },
   { type: 'fietstrainer_zilver', x: 28.8, z: -3.9, rot: 0 },
   { type: 'fietstrainer_zilver', x: 30.0, z: -3.9, rot: 0 },
-  { type: 'behandelbank', x: 31.4, z: -1.6, rot: 0 },
+  { type: 'behandelbank', x: 31.6, z: -2.3, rot: Math.PI / 2 },
   { type: 'roeimachine', x: 22.8, z: 0.4, rot: Math.PI / 2 },
   { type: 'romanchair', x: 20.4, z: 4.1, rot: 0 },
-  { type: 'mattenrek', x: 27.3, z: -1.0, rot: Math.PI },
+  { type: 'mattenrek', x: 27.3, z: -1.7, rot: Math.PI },
+  { type: 'plyobox45_grijs', x: 24.6, z: 2.6, rot: 0 },
+  { type: 'keiser', x: 25.3, z: -4.45, rot: 0 },
 ];
 
 function spawnObject(type, x, z, rot) {

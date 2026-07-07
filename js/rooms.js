@@ -40,15 +40,15 @@ export const GYMS = {
   },
   blauw: {
     id: 'blauw',
-    name: 'Blauwe zaal (10 × 10 m + 6 × 5 m)',
+    name: 'Blauwe zaal (10 × 10 m + 7 × 4 m)',
     floorColor: 0x8fa9b6,        // lichtblauw linoleum
     wallColor: 0xf0ede5,         // crèmewitte wanden
     height: 3.1,
     rects: [
       { minX: 16, maxX: 26, minZ: -5, maxZ: 5 },   // 10 x 10
-      { minX: 26, maxX: 32, minZ: -5, maxZ: 0 },   // 6 x 5
+      { minX: 26, maxX: 33, minZ: -5, maxZ: -1 },  // aanbouw: 7 breed x 4 diep
     ],
-    outline: [[16, -5], [32, -5], [32, 0], [26, 0], [26, 5], [16, 5]],
+    outline: [[16, -5], [33, -5], [33, -1], [26, -1], [26, 5], [16, 5]],
     spawn: { x: 21.5, z: 3.2, yaw: Math.PI / 4 },
     decals: [
       { text: '“One day or day one. You decide.”', color: '#2c2c2c', x: 21, y: 2.45, z: -4.88, ry: 0, w: 6, h: 0.55 },
