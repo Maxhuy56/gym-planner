@@ -241,6 +241,11 @@ const DEFAULT_LAYOUT = [
   { type: 'stangenrek', x: 9.5, z: 0.5, rot: -Math.PI / 2 },
   { type: 'dumbbellrek_zwart', x: 6.5, z: 2.55, rot: Math.PI },
   { type: 'legpress', x: 8.8, z: 1.8, rot: Math.PI },
+  { type: 'ghd', x: -2.8, z: 1.9, rot: Math.PI },
+  { type: 'legextension', x: 4.8, z: 2.35, rot: Math.PI },
+  { type: 'legcurl', x: 3.2, z: 2.35, rot: Math.PI },
+  { type: 'tv_wand', x: 9.8, z: 1.4, rot: -Math.PI / 2 },
+  { type: 'schijvenrek_grond', x: 4.2, z: -2.65, rot: 0 },
 
   // Blauwe zaal — cardiohoek (grote vierkant, westkant)
   { type: 'loopband_matrix', x: 17.3, z: -3.3, rot: Math.PI / 2 },
@@ -261,6 +266,9 @@ const DEFAULT_LAYOUT = [
   { type: 'fietstrainer_zilver', x: 28.8, z: -3.9, rot: 0 },
   { type: 'fietstrainer_zilver', x: 30.0, z: -3.9, rot: 0 },
   { type: 'behandelbank', x: 31.4, z: -1.6, rot: 0 },
+  { type: 'roeimachine', x: 22.8, z: 0.4, rot: Math.PI / 2 },
+  { type: 'romanchair', x: 20.4, z: 4.1, rot: 0 },
+  { type: 'mattenrek', x: 27.3, z: -1.0, rot: Math.PI },
 ];
 
 function spawnObject(type, x, z, rot) {

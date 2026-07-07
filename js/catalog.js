@@ -459,7 +459,161 @@ export const CATALOG = {
     },
   },
 
+  ghd: {
+    name: 'GHD (glute-ham)', w: 0.75, d: 1.7,
+    build() {
+      const g = new THREE.Group();
+      g.add(box(0.6, 0.07, 1.4, C.frame, 0, 0.09, 0));
+      g.add(box(0.7, 0.05, 0.3, C.frame, 0, 0.05, -0.72));
+      g.add(box(0.7, 0.05, 0.3, C.frame, 0, 0.05, 0.72));
+      // twee grote ronde heupkussens naast elkaar
+      const k1 = cyl(0.19, 0.26, C.pad, -0.15, 0.98, -0.25, 'z', 20);
+      const k2 = cyl(0.19, 0.26, C.pad, 0.15, 0.98, -0.25, 'z', 20);
+      k1.rotation.x = Math.PI / 2 + 0.15;
+      k2.rotation.x = Math.PI / 2 + 0.15;
+      g.add(k1, k2);
+      g.add(tube(0, 0.12, -0.35, 0, 0.9, -0.28, 0.04, C.frame));
+      // voetenplaat met rollen
+      g.add(box(0.5, 0.4, 0.05, C.frame2, 0, 0.6, 0.72));
+      g.add(cyl(0.06, 0.45, C.padGrijs, 0, 0.78, 0.6, 'x'));
+      g.add(cyl(0.06, 0.45, C.padGrijs, 0, 0.5, 0.6, 'x'));
+      g.add(tube(0, 0.12, 0.6, 0, 0.55, 0.66, 0.04, C.frame));
+      return g;
+    },
+  },
+  legextension: {
+    name: 'Leg extension', w: 1.0, d: 1.5,
+    build() {
+      const g = new THREE.Group();
+      g.add(box(0.85, 0.08, 1.3, C.staal, 0, 0.06, 0));
+      g.add(box(0.55, 0.12, 0.5, C.pad, 0, 0.52, 0.15));            // zitting
+      const rug = box(0.55, 0.6, 0.12, C.pad, 0, 0.85, 0.55);
+      rug.rotation.x = -0.15;
+      g.add(rug);
+      g.add(tube(0, 0.15, 0.5, 0, 0.55, 0.55, 0.04, C.frame));
+      // rol vóór de schenen
+      g.add(cyl(0.075, 0.55, C.padGrijs, 0, 0.3, -0.42, 'x'));
+      g.add(tube(-0.2, 0.5, -0.15, -0.2, 0.32, -0.42, 0.025, C.staal));
+      g.add(tube(0.2, 0.5, -0.15, 0.2, 0.32, -0.42, 0.025, C.staal));
+      // gewichtstapel-toren
+      g.add(box(0.35, 1.3, 0.35, C.frame, 0, 0.65, -0.55));
+      for (let i = 0; i < 8; i++) g.add(box(0.3, 0.05, 0.3, [0x3a3d44, 0.4, 0.6], 0, 0.15 + i * 0.09, -0.55));
+      return g;
+    },
+  },
+  legcurl: {
+    name: 'Leg curl (liggend)', w: 1.0, d: 1.7,
+    build() {
+      const g = new THREE.Group();
+      g.add(box(0.85, 0.08, 1.5, C.staal, 0, 0.06, 0));
+      // geknikte ligbank
+      const b1 = box(0.45, 0.09, 0.75, C.pad, 0, 0.72, 0.32);
+      b1.rotation.x = 0.12;
+      const b2 = box(0.45, 0.09, 0.6, C.pad, 0, 0.68, -0.32);
+      b2.rotation.x = -0.18;
+      g.add(b1, b2);
+      g.add(tube(0, 0.1, 0.55, 0, 0.68, 0.5, 0.04, C.frame));
+      g.add(tube(0, 0.1, -0.45, 0, 0.62, -0.4, 0.04, C.frame));
+      // enkelrol boven het bed
+      g.add(cyl(0.07, 0.5, C.padGrijs, 0, 0.95, -0.72, 'x'));
+      g.add(tube(-0.18, 0.65, -0.5, -0.18, 0.93, -0.72, 0.025, C.staal));
+      g.add(tube(0.18, 0.65, -0.5, 0.18, 0.93, -0.72, 0.025, C.staal));
+      // gewichtstapel-toren
+      g.add(box(0.32, 1.1, 0.32, C.frame, -0.35, 0.55, -0.68));
+      for (let i = 0; i < 7; i++) g.add(box(0.27, 0.05, 0.27, [0x3a3d44, 0.4, 0.6], -0.35, 0.14 + i * 0.085, -0.68));
+      return g;
+    },
+  },
+  tv_wand: {
+    name: 'TV (wandmontage)', w: 1.4, d: 0.14,
+    build() {
+      const g = new THREE.Group();
+      g.add(box(0.25, 0.35, 0.06, C.frame2, 0, 1.75, -0.03));        // muurbeugel
+      g.add(box(1.4, 0.8, 0.06, [0x0a0a0c, 0.25, 0.2], 0, 1.75, 0.04));
+      g.add(box(1.3, 0.7, 0.065, [0x101820, 0.15, 0.3], 0, 1.75, 0.045));
+      return g;
+    },
+  },
+  schijvenrek_grond: {
+    name: 'Schijvenrek (vloer)', w: 1.2, d: 0.55,
+    build() {
+      const g = new THREE.Group();
+      // laag stalen rek met sleuven, schijven rechtop naast elkaar
+      g.add(box(1.2, 0.07, 0.5, C.frame, 0, 0.05, 0));
+      g.add(box(1.2, 0.05, 0.06, C.frame2, 0, 0.11, -0.18));
+      g.add(box(1.2, 0.05, 0.06, C.frame2, 0, 0.11, 0.18));
+      const kleuren = [C.rubber, C.rubber, C.rood, C.rood, [0x2f4f8f, 0.55, 0], C.rubber, [0xd8b93a, 0.6, 0], C.rubber];
+      kleuren.forEach((c, i) => g.add(plaat(0.22, 0.05, c, -0.49 + i * 0.14, 0.3, 0)));
+      return g;
+    },
+  },
+
   // ---------- Blauwe zaal (cardio) ----------
+  roeimachine: {
+    name: 'Roeimachine', w: 0.6, d: 2.4,
+    build() {
+      const g = new THREE.Group();
+      // monorail met zitje
+      const rail = box(0.12, 0.07, 1.75, C.staal, 0, 0.32, 0.25, 0, -0.04);
+      g.add(rail);
+      g.add(box(0.32, 0.06, 0.3, C.kunststof, 0, 0.42, 0.35));       // zitje
+      g.add(tube(0, 0.02, 1.1, 0, 0.3, 1.05, 0.03, C.staal));
+      g.add(tube(-0.22, 0.02, -0.3, -0.22, 0.28, -0.35, 0.025, C.staal));
+      g.add(tube(0.22, 0.02, -0.3, 0.22, 0.28, -0.35, 0.025, C.staal));
+      // vliegwielkooi (rond, verticaal) + display
+      g.add(cyl(0.3, 0.22, [0x33363b, 0.6, 0.3], 0, 0.55, -0.85, 'z', 24));
+      g.add(torus(0.3, 0.025, C.frame2, 0, 0.55, -0.85));
+      g.add(tube(0, 0.55, -0.85, 0, 1.05, -0.75, 0.025, C.frame2));
+      g.add(box(0.22, 0.15, 0.05, C.frame, 0, 1.1, -0.73, 0, -0.3)); // monitor
+      // voetsteunen + handvat
+      g.add(box(0.14, 0.3, 0.06, C.frame2, -0.22, 0.35, -0.5, 0, 0.4));
+      g.add(box(0.14, 0.3, 0.06, C.frame2, 0.22, 0.35, -0.5, 0, 0.4));
+      g.add(cyl(0.02, 0.4, C.kunststof, 0, 0.6, -0.55, 'x'));        // handvat
+      return g;
+    },
+  },
+  romanchair: {
+    name: 'Roman chair (rugextensie)', w: 0.7, d: 1.3,
+    build() {
+      const g = new THREE.Group();
+      g.add(box(0.6, 0.06, 0.35, C.frame, 0, 0.04, -0.45));
+      g.add(box(0.6, 0.06, 0.35, C.frame, 0, 0.04, 0.45));
+      g.add(box(0.1, 0.06, 1.1, C.frame, 0, 0.04, 0));
+      // schuin omhoog naar de heupkussens (45 graden)
+      g.add(tube(0, 0.07, 0.45, 0, 0.85, -0.05, 0.04, C.frame));
+      const k1 = cyl(0.13, 0.24, C.pad, -0.14, 0.88, -0.1, 'z', 18);
+      const k2 = cyl(0.13, 0.24, C.pad, 0.14, 0.88, -0.1, 'z', 18);
+      k1.rotation.x = Math.PI / 2 - 0.3;
+      k2.rotation.x = Math.PI / 2 - 0.3;
+      g.add(k1, k2);
+      // voetplaat met enkelrollen
+      g.add(box(0.5, 0.3, 0.05, C.frame2, 0, 0.3, 0.55));
+      g.add(cyl(0.055, 0.45, C.padGrijs, 0, 0.45, 0.48, 'x'));
+      g.add(cyl(0.055, 0.45, C.padGrijs, 0, 0.18, 0.48, 'x'));
+      return g;
+    },
+  },
+  mattenrek: {
+    name: 'Mattenrek (rijdend)', w: 1.3, d: 0.75,
+    build() {
+      const g = new THREE.Group();
+      // rijdend frame met bovenbuis waar matjes aan hangen
+      g.add(box(1.25, 0.06, 0.65, C.staal, 0, 0.09, 0));
+      for (const [sx, sz] of [[-0.55, -0.25], [0.55, -0.25], [-0.55, 0.25], [0.55, 0.25]]) {
+        g.add(cyl(0.05, 0.07, C.kunststof, sx, 0.035, sz, 'y', 12)); // zwenkwielen
+      }
+      g.add(tube(-0.58, 0.12, 0, -0.58, 1.7, 0, 0.035, C.staal));
+      g.add(tube(0.58, 0.12, 0, 0.58, 1.7, 0, 0.035, C.staal));
+      g.add(cyl(0.03, 1.2, C.staal, 0, 1.7, 0, 'x'));                // hangbuis
+      // hangende sportmatjes
+      const matKleuren = [[0x3a6fb5, 0.8, 0], [0xc23b2e, 0.8, 0], [0x3f8f4f, 0.8, 0], [0x3a6fb5, 0.8, 0], [0xd8b93a, 0.8, 0]];
+      matKleuren.forEach((c, i) => {
+        g.add(box(0.025, 0.9, 0.5, c, -0.4 + i * 0.2, 1.2, 0));
+      });
+      return g;
+    },
+  },
+
   loopband_matrix: {
     name: 'Loopband (Matrix)', w: 0.95, d: 2.2,
     build() {
