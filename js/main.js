@@ -3,7 +3,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { GYMS, pointInGym, gymAt, clampToGym, rotatedHalfExtents } from './rooms.js';
 import { CATALOG, createObject } from './catalog.js';
 import { downloadFloorplan } from './floorplan.js';
-import { brickTex, tileTex, rubberTex, klinkerTex, linoTex, ceilTex, blindsTex, clockTex, glowTex } from './textures.js';
+import { brickTex, tileTex, rubberTex, klinkerTex, linoTex, ceilTex, blindsTex, clockTex } from './textures.js';
 
 const EYE = 1.65;          // ooghoogte in meters
 const WALL_T = 0.2;        // muurdikte
@@ -150,25 +150,15 @@ function buildGym(gym) {
     g.add(kozijn);
   }
 
-  // plafondarmaturen (zelfverlichtend) met warme gloed alsof ze aan staan
-  const gloedTex = glowTex();
+  // plafondarmaturen: strak vierkant, maar zo fel als een brandende lamp
+  // (toneMapped uitgeschakeld zodat het paneel écht licht lijkt te geven)
   for (const li of gym.lights || []) {
     const paneel = new THREE.Mesh(
       new THREE.BoxGeometry(li.w, 0.06, li.d),
-      new THREE.MeshBasicMaterial({ color: 0xfff8ea })
+      new THREE.MeshBasicMaterial({ color: 0xfff3d6, toneMapped: false })
     );
     paneel.position.set(li.x, gym.height - 0.04, li.z);
     g.add(paneel);
-    const gloed = new THREE.Mesh(
-      new THREE.PlaneGeometry(Math.max(li.w, li.d) * 2.6, Math.max(li.w, li.d) * 2.6),
-      new THREE.MeshBasicMaterial({
-        map: gloedTex, transparent: true, depthWrite: false,
-        blending: THREE.AdditiveBlending, opacity: 0.75,
-      })
-    );
-    gloed.rotation.x = Math.PI / 2;
-    gloed.position.set(li.x, gym.height - 0.12, li.z);
-    g.add(gloed);
   }
 
   // muurdecoraties: teksten en klokken (transparante canvas-textuur)
@@ -263,7 +253,7 @@ const DEFAULT_LAYOUT = [
   { type: 'schijvenrek_grond', x: 4.2, z: -2.65, rot: 0 },
 
   // Blauwe zaal — cardiohoek (grote vierkant, westkant)
-  { type: 'loopband_matrix', x: 17.3, z: -3.3, rot: Math.PI / 2 },
+  { type: 'loopband_matrix', x: 17.5, z: -2.9, rot: Math.PI / 2 },
   { type: 'crosstrainer', x: 17.3, z: -1.4, rot: Math.PI / 2 },
   { type: 'hometrainer', x: 17.3, z: 0.3, rot: Math.PI / 2 },
   { type: 'spinningfiets', x: 19.8, z: -4.2, rot: 0 },

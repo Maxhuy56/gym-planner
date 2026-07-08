@@ -45,19 +45,18 @@ export const GYMS = {
     floorColor: 0x8fa9b6,        // lichtblauw linoleum
     wallColor: 0xf0ede5,         // crèmewitte wanden
     height: 3.1,
-    // Het grote vierkant is gesplitst in drie rechthoeken zodat de
-    // inbouw (1 m diep x 1,5 m breed, rechts van de middenlijn aan de
+    // Het grote vierkant is gesplitst in twee rechthoeken zodat de
+    // inbouw (1 m diep x 1,5 m breed, helemaal in de hoek aan de
     // westmuur) écht ruimte inneemt: je kunt er niet doorheen lopen en
     // er geen objecten plaatsen.
     rects: [
       { minX: 17, maxX: 26, minZ: -5, maxZ: 5, label: '10 × 10 m' },
-      { minX: 16, maxX: 17, minZ: -5, maxZ: -1.7, noLabel: true },
-      { minX: 16, maxX: 17, minZ: -0.2, maxZ: 5, noLabel: true },
+      { minX: 16, maxX: 17, minZ: -3.5, maxZ: 5, noLabel: true },
       { minX: 26, maxX: 30, minZ: -5, maxZ: 2, label: '4 × 7 m' },   // aanbouw: 4 breed x 7 diep
     ],
     outline: [
-      [16, -5], [30, -5], [30, 2], [26, 2], [26, 5], [16, 5],
-      [16, -0.2], [17, -0.2], [17, -1.7], [16, -1.7],
+      [17, -5], [30, -5], [30, 2], [26, 2], [26, 5], [16, 5],
+      [16, -3.5], [17, -3.5],
     ],
     // plafond doorlopend over de hele zaal, ook boven de inbouw
     ceilRects: [
@@ -78,12 +77,16 @@ export const GYMS = {
       { x: 28, z: -3, w: 0.95, d: 0.95 }, { x: 28, z: 0, w: 0.95, d: 0.95 },
     ],
     deco: [
-      // westmuur (binnenvlak x=16,10): witte deur, glazen deur in het midden, raam links daarvan
-      { w: 0.06, h: 2.1, d: 1.0, color: 0xf7f6f2, x: 16.12, y: 1.05, z: -3.4 },            // witte deur
-      { w: 0.05, h: 2.1, d: 1.0, color: 0xf7f6f2, x: 16.12, y: 1.05, z: 0.4 },             // kozijn glazen deur
-      { w: 0.06, h: 1.95, d: 0.85, color: 0xc9dfec, x: 16.13, y: 1.02, z: 0.4, basic: true }, // glas
-      { w: 0.05, h: 1.5, d: 1.4, color: 0xf7f6f2, x: 16.12, y: 1.55, z: 2.2 },             // kozijn raam
-      { w: 0.06, h: 1.36, d: 1.26, color: 0xd6e6f0, x: 16.13, y: 1.55, z: 2.2, basic: true }, // ruit
+      // westmuur (binnenvlak x=16,10), van links naar rechts gezien vanuit de zaal:
+      // raam - glazen deur (in het midden) - raam, ruim weg van de inbouw in de hoek
+      { w: 0.05, h: 1.5, d: 1.4, color: 0xf7f6f2, x: 16.12, y: 1.55, z: 4.0 },             // kozijn raam links
+      { w: 0.06, h: 1.36, d: 1.26, color: 0xd6e6f0, x: 16.13, y: 1.55, z: 4.0, basic: true }, // ruit
+      { w: 0.05, h: 2.1, d: 1.0, color: 0xf7f6f2, x: 16.12, y: 1.05, z: 2.6 },             // kozijn glazen deur
+      { w: 0.06, h: 1.95, d: 0.85, color: 0xc9dfec, x: 16.13, y: 1.02, z: 2.6, basic: true }, // glas
+      { w: 0.05, h: 1.5, d: 1.4, color: 0xf7f6f2, x: 16.12, y: 1.55, z: 1.2 },             // kozijn raam rechts
+      { w: 0.06, h: 1.36, d: 1.26, color: 0xd6e6f0, x: 16.13, y: 1.55, z: 1.2, basic: true }, // ruit
+      // witte deur, verschoven zodat hij vrij blijft van de inbouw
+      { w: 0.06, h: 2.1, d: 1.0, color: 0xf7f6f2, x: 16.12, y: 1.05, z: -2.6 },
       // aanbouw: deur in het midden van de oostmuur (naast de klok)
       { w: 0.06, h: 2.1, d: 1.0, color: 0xf7f6f2, x: 29.88, y: 1.05, z: -1.5 },
       // nooduitgang op de zuidmuur van de aanbouw + bordje
