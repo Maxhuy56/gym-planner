@@ -224,19 +224,40 @@ export const CATALOG = {
     },
   },
   dumbbellrek_chroom: {
-    name: 'Dumbbellrek chroom (klein)', w: 1.1, d: 0.65,
+    name: 'Dumbbellrek chroom (verticaal)', w: 0.6, d: 0.6,
     build() {
       const g = new THREE.Group();
-      g.add(tube(-0.52, 0.1, 0.25, -0.52, 0.85, -0.2, 0.03, C.chroom));
-      g.add(tube(0.52, 0.1, 0.25, 0.52, 0.85, -0.2, 0.03, C.chroom));
-      g.add(box(0.58, 0.05, 0.1, C.chroom, 0, 0.02, 0.25));
-      g.add(box(0.58, 0.05, 0.1, C.chroom, 0, 0.02, -0.25, 0, 0));
-      g.add(box(1.04, 0.05, 0.34, C.staal, 0, 0.42, 0.1, 0, 0.12));
-      g.add(box(1.04, 0.05, 0.34, C.staal, 0, 0.78, -0.14, 0, 0.12));
-      for (let i = 0; i < 5; i++) {
-        g.add(dumbbell(0.05, 0.16, C.chroom, 0, 0, 0).translateX(-0.4 + i * 0.2).translateY(0.5).translateZ(0.08));
-        g.add(dumbbell(0.055, 0.16, C.chroom, 0, 0, 0).translateX(-0.4 + i * 0.2).translateY(0.86).translateZ(-0.16));
+      g.add(cyl(0.27, 0.05, C.staal, 0, 0.03, 0, 'y', 20));            // ronde voet
+      g.add(cyl(0.035, 1.5, C.chroom, 0, 0.78, 0));                    // kolom
+      g.add(ball(0.045, C.chroom, 0, 1.55, 0));                        // topdop
+      // per verdieping een paar dumbbells op uitstekende armen
+      for (let i = 0; i < 4; i++) {
+        const y = 0.32 + i * 0.36;
+        g.add(cyl(0.018, 0.5, C.chroom, 0, y, 0, 'x', 10));            // draagarm
+        const r = 0.055 - i * 0.006;
+        g.add(dumbbell(r, 0.15, C.chroom, 0, 0, 0).translateX(-0.21).translateY(y + 0.06));
+        g.add(dumbbell(r, 0.15, C.chroom, 0, 0, 0).translateX(0.21).translateY(y + 0.06));
       }
+      return g;
+    },
+  },
+  ballentoren: {
+    name: 'Medicijnballenrek (verticaal)', w: 0.6, d: 0.6,
+    build() {
+      const g = new THREE.Group();
+      g.add(cyl(0.27, 0.05, C.staal, 0, 0.03, 0, 'y', 20));            // ronde voet
+      g.add(cyl(0.035, 1.5, C.chroom, 0, 0.78, 0));                    // kolom
+      g.add(ball(0.045, C.chroom, 0, 1.55, 0));
+      const kleuren = [[0x2f4f8f, 0.7, 0], [0x8f3a3a, 0.7, 0], [0x3d4045, 0.7, 0], [0x4a7a4f, 0.7, 0]];
+      // per verdieping een ring met een medicijnbal erin
+      kleuren.forEach((c, i) => {
+        const y = 0.3 + i * 0.36;
+        const ring = torus(0.13, 0.015, C.chroom, 0.2, y, 0);
+        ring.rotation.x = Math.PI / 2;
+        g.add(ring);
+        g.add(cyl(0.015, 0.2, C.chroom, 0.1, y, 0, 'x', 8));           // ringsteun
+        g.add(ball(0.13 - i * 0.008, c, 0.2, y + 0.09, 0));
+      });
       return g;
     },
   },

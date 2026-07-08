@@ -77,20 +77,17 @@ export const GYMS = {
       { x: 28, z: -3, w: 0.95, d: 0.95 }, { x: 28, z: 0, w: 0.95, d: 0.95 },
     ],
     deco: [
-      // westmuur (binnenvlak x=16,10), van links naar rechts gezien vanuit de zaal:
-      // raam - glazen deur (in het midden) - raam, ruim weg van de inbouw in de hoek
-      { w: 0.05, h: 1.5, d: 1.4, color: 0xf7f6f2, x: 16.12, y: 1.55, z: 4.0 },             // kozijn raam links
-      { w: 0.06, h: 1.36, d: 1.26, color: 0xd6e6f0, x: 16.13, y: 1.55, z: 4.0, basic: true }, // ruit
-      { w: 0.05, h: 2.1, d: 1.0, color: 0xf7f6f2, x: 16.12, y: 1.05, z: 2.6 },             // kozijn glazen deur
-      { w: 0.06, h: 1.95, d: 0.85, color: 0xc9dfec, x: 16.13, y: 1.02, z: 2.6, basic: true }, // glas
-      { w: 0.05, h: 1.5, d: 1.4, color: 0xf7f6f2, x: 16.12, y: 1.55, z: 1.2 },             // kozijn raam rechts
-      { w: 0.06, h: 1.36, d: 1.26, color: 0xd6e6f0, x: 16.13, y: 1.55, z: 1.2, basic: true }, // ruit
-      // witte deur, verschoven zodat hij vrij blijft van de inbouw
-      { w: 0.06, h: 2.1, d: 1.0, color: 0xf7f6f2, x: 16.12, y: 1.05, z: -2.6 },
+      // westmuur (binnenvlak x=16,10): raam - glazen deur - raam, 1 m naar
+      // rechts opgeschoven (richting de inbouw in de hoek)
+      { w: 0.05, h: 1.5, d: 1.4, color: 0xf7f6f2, x: 16.12, y: 1.55, z: 3.0 },             // kozijn raam links
+      { w: 0.06, h: 1.36, d: 1.26, color: 0xd6e6f0, x: 16.13, y: 1.55, z: 3.0, basic: true }, // ruit
+      { w: 0.05, h: 2.1, d: 1.0, color: 0xf7f6f2, x: 16.12, y: 1.05, z: 1.6 },             // kozijn glazen deur
+      { w: 0.06, h: 1.95, d: 0.85, color: 0xc9dfec, x: 16.13, y: 1.02, z: 1.6, basic: true }, // glas
+      { w: 0.05, h: 1.5, d: 1.4, color: 0xf7f6f2, x: 16.12, y: 1.55, z: 0.2 },             // kozijn raam rechts
+      { w: 0.06, h: 1.36, d: 1.26, color: 0xd6e6f0, x: 16.13, y: 1.55, z: 0.2, basic: true }, // ruit
       // aanbouw: deur in het midden van de oostmuur (naast de klok)
       { w: 0.06, h: 2.1, d: 1.0, color: 0xf7f6f2, x: 29.88, y: 1.05, z: -1.5 },
-      // nooduitgang op de zuidmuur van de aanbouw + bordje
-      { w: 1.0, h: 2.1, d: 0.06, color: 0xf7f6f2, x: 28, y: 1.05, z: -4.86 },
+      // nooduitgang-bordje (de deur eronder is weggehaald)
       { w: 0.38, h: 0.16, d: 0.06, color: 0x2e9e4f, x: 28, y: 2.32, z: -4.85, basic: true },
       // radiator
       { w: 2.6, h: 0.55, d: 0.12, color: 0xf3f2ee, x: 21, y: 0.35, z: -4.82 },
@@ -115,15 +112,23 @@ export function gymAt(x, z) {
 }
 
 // Past een voetafdruk (halfbreedte hx, halfdiepte hz rond x,z) binnen de zaal?
-// Alle vier hoeken moeten binnen de unie van rechthoeken vallen; bij een
-// L-vorm mag een object dus over de "naad" tussen de twee delen staan.
+// We bemonsteren een raster over de (met "inset" vergrote) voetafdruk en
+// eisen dat elk punt binnen de unie van rechthoeken ligt — zónder inset per
+// rechthoek. Zo telt de marge alleen bij echte buitenmuren en kun je gewoon
+// over de naad tussen twee rechthoeken lopen (zaal <-> aanbouw).
 export function footprintInGym(gym, x, z, hx, hz, inset = 0) {
-  const corners = [
-    [x - hx, z - hz], [x + hx, z - hz],
-    [x - hx, z + hz], [x + hx, z + hz],
-    [x, z],
-  ];
-  return corners.every(([cx, cz]) => pointInGym(gym, cx, cz, inset));
+  const ex = hx + inset, ez = hz + inset;
+  const step = 0.35;
+  const nx = Math.max(2, Math.ceil((2 * ex) / step) + 1);
+  const nz = Math.max(2, Math.ceil((2 * ez) / step) + 1);
+  for (let i = 0; i < nx; i++) {
+    for (let j = 0; j < nz; j++) {
+      const px = x - ex + (2 * ex * i) / (nx - 1);
+      const pz = z - ez + (2 * ez * j) / (nz - 1);
+      if (!pointInGym(gym, px, pz)) return false;
+    }
+  }
+  return true;
 }
 
 // Klem een positie zó dat de voetafdruk binnen de zaal blijft.
