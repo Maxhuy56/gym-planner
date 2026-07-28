@@ -530,7 +530,9 @@ export const CATALOG = {
       const g = new THREE.Group();
       const glas = new THREE.Mesh(
         new THREE.BoxGeometry(1.8, 1.9, 0.02),
-        new THREE.MeshStandardMaterial({ color: 0xcfd9de, roughness: 0.04, metalness: 1.0 })
+        // Lichtblauw-grijs glanzend vlak: lage metalness zodat het niet
+        // zwart wordt, lage roughness voor een reflecterende sheen.
+        new THREE.MeshStandardMaterial({ color: 0xd4e4f0, roughness: 0.12, metalness: 0.25, envMapIntensity: 1.4 })
       );
       glas.position.set(0, 1.15, 0.02);
       g.add(glas);

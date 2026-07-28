@@ -5,14 +5,14 @@
 export const GYMS = {
   fitness: {
     id: 'fitness',
-    name: 'Fitnessruimte (6 × 20 m)',
+    name: 'Fitnessruimte (6 × 18 m)',
     floorColor: 0x2b2c2e,        // donkere rubbervloer
     floorBorder: { width: 0.9, color: 0xe9e5dc },  // witte klinkerrand langs de muren
     wallColor: 0xf1f0ed,         // tegelpanelen boven
     wallLower: { height: 2.2, color: 0xe7e3da },   // witte baksteen onder
     height: 4.0,
-    rects: [{ minX: -10, maxX: 10, minZ: -3, maxZ: 3 }],
-    outline: [[-10, -3], [10, -3], [10, 3], [-10, 3]],
+    rects: [{ minX: -8, maxX: 10, minZ: -3, maxZ: 3 }],
+    outline: [[-8, -3], [10, -3], [10, 3], [-8, 3]],
     spawn: { x: -6.0, z: 0.6, yaw: -Math.PI / 2 },
     decals: [
       // gouden tekst op de zuidmuur, helemaal in de (oost)hoek
@@ -20,7 +20,7 @@ export const GYMS = {
       { type: 'clock', x: 9.87, y: 3.1, z: 0, ry: -Math.PI / 2, w: 0.55, h: 0.55 },
     ],
     // tl-armaturen in twee rijen
-    lights: [-8, -4.8, -1.6, 1.6, 4.8, 8].flatMap(x => [
+    lights: [-6.5, -3.5, -0.5, 2.5, 5.5, 8.5].flatMap(x => [
       { x, z: -1.5, w: 1.8, d: 0.3 },
       { x, z: 1.5, w: 1.8, d: 0.3 },
     ]),
