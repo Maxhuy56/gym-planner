@@ -223,6 +223,36 @@ export const CATALOG = {
       return g;
     },
   },
+  benchpress: {
+    name: 'Bench press (met bankje)', w: 1.8, d: 1.4,
+    build() {
+      const g = new THREE.Group();
+      // donker grondframe (H-vorm) — geen wit ondervlak
+      g.add(box(0.1, 0.08, 1.25, C.frame, -0.5, 0.05, 0));
+      g.add(box(0.1, 0.08, 1.25, C.frame, 0.5, 0.05, 0));
+      g.add(box(1.1, 0.08, 0.1, C.frame, 0, 0.05, -0.5));
+      // twee staanders met J-haken
+      for (const sx of [-0.5, 0.5]) {
+        g.add(box(0.09, 1.12, 0.09, C.frame, sx, 0.6, -0.45));
+        g.add(box(0.15, 0.1, 0.16, C.frame2, sx, 1.1, -0.38));      // J-haak
+      }
+      // halterstang met schijven op borsthoogte
+      g.add(cyl(0.016, 1.3, C.rvs, 0, 1.15, -0.4, 'x', 12));
+      g.add(cyl(0.018, 0.32, C.frame2, -0.32, 1.15, -0.4, 'x', 12)); // knurling
+      g.add(cyl(0.018, 0.32, C.frame2, 0.32, 1.15, -0.4, 'x', 12));
+      g.add(cyl(0.03, 0.05, C.rvs, -0.6, 1.15, -0.4, 'x', 12));      // sluitringen
+      g.add(cyl(0.03, 0.05, C.rvs, 0.6, 1.15, -0.4, 'x', 12));
+      g.add(plaat(0.22, 0.05, C.rubber, -0.7, 1.15, -0.4));
+      g.add(plaat(0.22, 0.05, C.rubber, 0.7, 1.15, -0.4));
+      // vlak bankje
+      g.add(box(0.34, 0.12, 1.15, C.pad, 0, 0.46, 0.08));            // kussen
+      g.add(box(0.3, 0.05, 0.6, C.frame, 0, 0.4, 0.08));             // onderframe kussen
+      g.add(tube(0, 0.08, 0.6, 0, 0.4, 0.55, 0.035, C.frame));       // steunpoot voor
+      g.add(tube(-0.12, 0.08, -0.42, -0.12, 0.4, -0.35, 0.03, C.frame));
+      g.add(tube(0.12, 0.08, -0.42, 0.12, 0.4, -0.35, 0.03, C.frame));
+      return g;
+    },
+  },
   dumbbellrek_chroom: {
     name: 'Dumbbellrek chroom (verticaal)', w: 0.6, d: 0.6,
     build() {
@@ -406,7 +436,7 @@ export const CATALOG = {
     name: 'Stangenrek (hexbar/curlbar)', w: 0.7, d: 0.5,
     build() {
       const g = new THREE.Group();
-      g.add(box(0.7, 0.05, 0.5, C.creme, 0, 0.025, 0));
+      g.add(box(0.7, 0.05, 0.5, C.frame, 0, 0.025, 0));
       for (const sx of [-0.22, 0, 0.22]) g.add(cyl(0.032, 1.35, C.staal, sx, 0.72, -0.08));
       g.add(cyl(0.02, 1.7, C.rvs, -0.22, 1.0, -0.08));
       // hexbar: zeshoekige ring van buizen
@@ -575,12 +605,12 @@ export const CATALOG = {
     },
   },
   tv_wand: {
-    name: 'TV (wandmontage)', w: 1.4, d: 0.14,
+    name: 'TV (wandmontage)', w: 0.95, d: 0.12,
     build() {
       const g = new THREE.Group();
-      g.add(box(0.25, 0.35, 0.06, C.frame2, 0, 1.75, -0.03));        // muurbeugel
-      g.add(box(1.4, 0.8, 0.06, [0x0a0a0c, 0.25, 0.2], 0, 1.75, 0.04));
-      g.add(box(1.3, 0.7, 0.065, [0x101820, 0.15, 0.3], 0, 1.75, 0.045));
+      g.add(box(0.2, 0.28, 0.05, C.frame2, 0, 1.75, -0.03));         // muurbeugel
+      g.add(box(0.92, 0.52, 0.05, [0x0a0a0c, 0.25, 0.2], 0, 1.75, 0.03));  // behuizing (16:9)
+      g.add(box(0.84, 0.46, 0.055, [0x101820, 0.15, 0.3], 0, 1.75, 0.035)); // scherm
       return g;
     },
   },

@@ -237,6 +237,7 @@ const DEFAULT_LAYOUT = [
   { type: 'medicijnballen', x: -1.0, z: 2.6, rot: Math.PI },
   { type: 'ballentoren', x: -1.9, z: 2.55, rot: 0 },
   { type: 'sandbag', x: 0.2, z: 2.4, rot: 0 },
+  { type: 'benchpress', x: 2.2, z: 0.2, rot: 0 },
   { type: 'buikspierbank', x: 1.8, z: 2.2, rot: Math.PI },
   { type: 'verstelbank', x: 3.6, z: 1.2, rot: 0.4 },
   // oostkant — racks en gewichten
