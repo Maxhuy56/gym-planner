@@ -372,7 +372,9 @@ function updateInventoryUI() {
 // ---------- Plaatsen ----------
 function setOpacity(root, opacity) {
   root.traverse(m => {
-    if (m.isMesh && m.material) {
+    // De contactschaduw (userData.isShadow) moet altijd transparant blijven,
+    // anders wordt na het plaatsen zijn alpha-0 rand een dekvlak op de vloer.
+    if (m.isMesh && m.material && !m.userData.isShadow) {
       m.material.transparent = opacity < 1;
       m.material.opacity = opacity;
     }
